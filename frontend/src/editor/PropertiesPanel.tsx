@@ -7,7 +7,6 @@ export function PropertiesPanel() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const selectedId = useEditorStore(s => s.selectedId);
   const pages = useEditorStore(s => s.pages);
-  const currentPageId = useEditorStore(s => s.currentPageId);
   const components = useEditorStore(s => {
     const page = s.pages.find(p => p.id === s.currentPageId);
     return page ? page.components : [];

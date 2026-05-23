@@ -2,7 +2,7 @@ import { Type, Image, GripVertical, Search, Box, Grid, MousePointer2, Layers, Wa
 import { motion } from 'framer-motion';
 import { useDraggable } from '@dnd-kit/core';
 import { useEditorStore } from '../store/useEditorStore';
-import type { ComponentType } from '../store/useEditorStore';
+import type { ComponentType, ComponentData } from '../store/useEditorStore';
 
 function DraggableItem({ id, label, icon }: { id: string, label: string, icon: React.ReactNode }) {
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
@@ -30,7 +30,9 @@ function DraggableItem({ id, label, icon }: { id: string, label: string, icon: R
 }
 
 export function Sidebar() {
-  const components = useEditorStore(s => s.components);
+  const pages = useEditorStore(s => s.pages);
+  const currentPageId = useEditorStore(s => s.currentPageId);
+  const components = pages.find(p => p.id === currentPageId)?.components || [];
   const selectComponent = useEditorStore(s => s.selectComponent);
   const selectedId = useEditorStore(s => s.selectedId);
 
@@ -120,7 +122,7 @@ export function Sidebar() {
         </h3>
         <div className="space-y-1">
           {components.length === 0 && <p className="text-xs text-zinc-600 italic px-2">No layers yet.</p>}
-          {components.map(comp => (
+          {components.map((comp: ComponentData) => (
             <div 
               key={comp.id}
               onClick={() => selectComponent(comp.id)}
