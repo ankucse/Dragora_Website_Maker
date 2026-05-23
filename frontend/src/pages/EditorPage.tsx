@@ -2,7 +2,7 @@ import { Sidebar } from '../editor/Sidebar';
 import { Canvas } from '../editor/Canvas';
 import { PropertiesPanel } from '../editor/PropertiesPanel';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Play, Globe, Layout, MousePointer2, Smartphone, Monitor } from 'lucide-react';
+import { ArrowLeft, Play, Globe, Smartphone, Monitor } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export default function EditorPage() {

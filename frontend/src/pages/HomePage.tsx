@@ -1,5 +1,5 @@
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { ArrowRight, Sparkles, Layers, Zap, Code, ChevronRight } from 'lucide-react';
+import { ArrowRight, Sparkles, Layers, Zap, Code } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export default function HomePage() {

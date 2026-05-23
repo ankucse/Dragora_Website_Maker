@@ -1,4 +1,4 @@
-import { Type, Image, Square, AlignLeft, GripVertical, Search, Box, Grid, Play, MousePointer2, Sparkles, Layers, Wand2 } from 'lucide-react';
+import { Type, Image, AlignLeft, GripVertical, Search, Box, Grid, MousePointer2, Sparkles, Layers, Wand2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export function Sidebar() {

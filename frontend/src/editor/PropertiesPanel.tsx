@@ -1,5 +1,5 @@
 import { useEditorStore } from '../store/useEditorStore';
-import { AlignLeft, AlignCenter, AlignRight, AlignJustify, Type, Layout, Maximize, Palette, Wand2, MonitorPlay } from 'lucide-react';
+import { Layout, Wand2, MonitorPlay, Play } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export function PropertiesPanel() {

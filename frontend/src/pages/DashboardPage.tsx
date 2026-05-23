@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
-  Plus, Settings, Activity, Globe, Zap, 
-  BarChart3, Users, Clock, Search, ArrowUpRight,
+  Plus, Activity, Globe, Zap, 
+  Users, Search,
   ShieldAlert, LayoutDashboard
 } from 'lucide-react';
 
