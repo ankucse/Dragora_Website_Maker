@@ -2,18 +2,22 @@ import { Type, Image, GripVertical, Search, Box, Grid, MousePointer2, Layers, Wa
 import { motion } from 'framer-motion';
 import { useDraggable } from '@dnd-kit/core';
 import { useEditorStore } from '../store/useEditorStore';
+import type { ComponentType } from '../store/useEditorStore';
 
 function DraggableItem({ id, label, icon }: { id: string, label: string, icon: React.ReactNode }) {
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: `sidebar-${id}`,
     data: { type: id }
   });
+  
+  const addComponent = useEditorStore(s => s.addComponent);
 
   return (
     <div 
       ref={setNodeRef}
       {...listeners}
       {...attributes}
+      onClick={() => addComponent(id as ComponentType, {}, 300, 300)}
       className={`flex flex-col items-center justify-center p-3 rounded-xl border ${isDragging ? 'border-indigo-500 bg-indigo-500/20' : 'border-white/5 bg-zinc-900/30'} hover:bg-zinc-800 hover:border-indigo-500/30 transition-all cursor-grab active:cursor-grabbing group shadow-sm z-50`}
       style={{ opacity: isDragging ? 0.5 : 1 }}
     >

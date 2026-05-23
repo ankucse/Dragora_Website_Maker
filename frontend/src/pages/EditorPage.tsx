@@ -110,7 +110,7 @@ export default function EditorPage() {
           <Sidebar />
           <div className="flex-1 relative flex justify-center overflow-hidden transition-all duration-300">
              {/* The Canvas wrapper width is driven by deviceMode */}
-             <div className="h-full border-x border-white/5 bg-[#0a0a0a] transition-all duration-500" style={{ width: deviceMode === 'mobile' ? '375px' : deviceMode === 'tablet' ? '768px' : '100%' }}>
+             <div className="h-full border-x border-white/5 bg-[#0a0a0a] transition-all duration-500 flex flex-col" style={{ width: deviceMode === 'mobile' ? '375px' : deviceMode === 'tablet' ? '768px' : '100%' }}>
                 <Canvas />
              </div>
           </div>

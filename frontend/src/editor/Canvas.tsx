@@ -280,7 +280,7 @@ export function Canvas() {
   };
   
   return (
-    <div className="flex-1 overflow-hidden bg-[#0a0a0a] relative canvas-grid">
+    <div className="w-full h-full overflow-hidden bg-[#0a0a0a] relative canvas-grid">
       {/* Pan & Zoom Container */}
       <div className="absolute inset-0 overflow-auto flex items-center justify-center p-12 custom-scrollbar">
         <div 
