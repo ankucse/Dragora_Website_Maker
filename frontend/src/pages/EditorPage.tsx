@@ -2,17 +2,41 @@ import { Sidebar } from '../editor/Sidebar';
 import { Canvas } from '../editor/Canvas';
 import { PropertiesPanel } from '../editor/PropertiesPanel';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Play, Globe, Smartphone, Monitor } from 'lucide-react';
+import { ArrowLeft, Play, Globe, Smartphone, Monitor, Tablet, Undo2, Redo2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { DndContext } from '@dnd-kit/core';
 import type { DragEndEvent } from '@dnd-kit/core';
 import { useEditorStore } from '../store/useEditorStore';
 import type { ComponentType } from '../store/useEditorStore';
+import { useEffect } from 'react';
 
 export default function EditorPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const addComponent = useEditorStore(s => s.addComponent);
+  const undo = useEditorStore(s => s.undo);
+  const redo = useEditorStore(s => s.redo);
+  const pastCount = useEditorStore(s => s.past.length);
+  const futureCount = useEditorStore(s => s.future.length);
+  const deviceMode = useEditorStore(s => s.deviceMode);
+  const setDeviceMode = useEditorStore(s => s.setDeviceMode);
+
+  // Global Keyboard Shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
+        if (e.shiftKey) {
+          e.preventDefault();
+          redo();
+        } else {
+          e.preventDefault();
+          undo();
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [undo, redo]);
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { over, active } = event;
@@ -20,11 +44,9 @@ export default function EditorPage() {
     // If dropped over the canvas
     if (over && over.id === 'canvas') {
       const typeStr = active.id.toString().replace('sidebar-', '');
-      // Validate type to appease TS
-      const validTypes = ['hero', 'grid', 'flex', 'mesh', 'liquid', 'particles', 'text', 'image', 'button'];
-      if (validTypes.includes(typeStr)) {
-        addComponent(typeStr as ComponentType);
-      }
+      // Calculate drop position relative to canvas
+      // For now, dropping from sidebar spawns at center (300, 300) since react-rnd takes over
+      addComponent(typeStr as ComponentType, {}, 300, 300);
     }
   };
 
@@ -44,16 +66,26 @@ export default function EditorPage() {
           
           <div className="w-[1px] h-6 bg-white/10"></div>
 
+          {/* Device Toggles */}
+          <div className="flex items-center gap-1 bg-zinc-950 p-1 rounded-full border border-white/5">
+            <button onClick={() => setDeviceMode('desktop')} className={`p-1.5 rounded-full transition-colors ${deviceMode === 'desktop' ? 'bg-indigo-500 text-white' : 'text-zinc-500 hover:text-zinc-300'}`}><Monitor className="w-4 h-4" /></button>
+            <button onClick={() => setDeviceMode('tablet')} className={`p-1.5 rounded-full transition-colors ${deviceMode === 'tablet' ? 'bg-indigo-500 text-white' : 'text-zinc-500 hover:text-zinc-300'}`}><Tablet className="w-4 h-4" /></button>
+            <button onClick={() => setDeviceMode('mobile')} className={`p-1.5 rounded-full transition-colors ${deviceMode === 'mobile' ? 'bg-indigo-500 text-white' : 'text-zinc-500 hover:text-zinc-300'}`}><Smartphone className="w-4 h-4" /></button>
+          </div>
+
+          <div className="w-[1px] h-6 bg-white/10"></div>
+
+          {/* History */}
           <div className="flex items-center gap-2">
-            <div className="p-2 rounded-full bg-white/10 text-white cursor-pointer"><Monitor className="w-4 h-4" /></div>
-            <div className="p-2 rounded-full hover:bg-white/5 text-zinc-500 hover:text-zinc-300 cursor-pointer transition-colors"><Smartphone className="w-4 h-4" /></div>
+            <button onClick={undo} disabled={pastCount === 0} className={`p-1.5 rounded-full transition-colors ${pastCount > 0 ? 'text-zinc-300 hover:bg-white/10' : 'text-zinc-700 cursor-not-allowed'}`}><Undo2 className="w-4 h-4" /></button>
+            <button onClick={redo} disabled={futureCount === 0} className={`p-1.5 rounded-full transition-colors ${futureCount > 0 ? 'text-zinc-300 hover:bg-white/10' : 'text-zinc-700 cursor-not-allowed'}`}><Redo2 className="w-4 h-4" /></button>
           </div>
 
           <div className="w-[1px] h-6 bg-white/10"></div>
 
           <div className="flex items-center gap-4 text-sm font-medium">
             <span className="text-zinc-500 hidden sm:inline-block">{id === 'new' ? 'Untitled Project' : id}</span>
-            <span className="px-2 py-0.5 rounded-full bg-green-500/10 text-green-400 text-[10px] uppercase tracking-wider font-bold">Saved</span>
+            <span className="px-2 py-0.5 rounded-full bg-green-500/10 text-green-400 text-[10px] uppercase tracking-wider font-bold">Autosaved</span>
           </div>
 
           <div className="w-[1px] h-6 bg-white/10"></div>
@@ -70,7 +102,12 @@ export default function EditorPage() {
 
         <div className="flex-1 flex relative">
           <Sidebar />
-          <Canvas />
+          <div className="flex-1 relative flex justify-center overflow-hidden transition-all duration-300">
+             {/* The Canvas wrapper width is driven by deviceMode */}
+             <div className="h-full border-x border-white/5 bg-[#0a0a0a] transition-all duration-500" style={{ width: deviceMode === 'mobile' ? '375px' : deviceMode === 'tablet' ? '768px' : '100%' }}>
+                <Canvas />
+             </div>
+          </div>
           <PropertiesPanel />
         </div>
       </div>
