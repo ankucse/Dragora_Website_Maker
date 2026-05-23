@@ -155,12 +155,12 @@ export default function DashboardPage() {
                     <p className="text-sm text-zinc-500 mt-1">acme-frontend.lumina.build</p>
                   </div>
                 </div>
-                <div className="hidden sm:block text-right">
+                  <div className="hidden sm:block text-right">
                   <p className="text-sm text-zinc-400 flex items-center justify-end gap-2">
                     <span className="w-2 h-2 rounded-full bg-green-500"></span>
-                    Deployed 2m ago
+                    Published 2m ago
                   </p>
-                  <p className="text-xs text-zinc-600 mt-1 font-mono">Commit: 7a8b9c2</p>
+                  <p className="text-xs text-zinc-600 mt-1 font-mono">Last edited today</p>
                 </div>
               </div>
             </motion.div>
@@ -172,8 +172,8 @@ export default function DashboardPage() {
             <div className="bg-zinc-900/30 border border-white/5 rounded-2xl p-6">
               <div className="space-y-6">
                 {[
-                  { user: 'S', action: 'deployed to Production', time: '2m ago', color: 'bg-indigo-500' },
-                  { user: 'A', action: 'pushed to main', time: '5m ago', color: 'bg-green-500' },
+                  { user: 'S', action: 'published Unicorn SaaS', time: '2m ago', color: 'bg-indigo-500' },
+                  { user: 'A', action: 'edited Home page', time: '5m ago', color: 'bg-green-500' },
                   { user: 'K', action: 'updated CSS Grid layout', time: '1h ago', color: 'bg-blue-500' },
                   { user: 'S', action: 'invited Alex to Workspace', time: '3h ago', color: 'bg-purple-500' },
                 ].map((act, i) => (

@@ -13,6 +13,8 @@ export function Canvas() {
   const selectComponent = useEditorStore(s => s.selectComponent);
   const addComponent = useEditorStore(s => s.addComponent);
   const updateComponent = useEditorStore(s => s.updateComponent);
+  const isPreview = useEditorStore(s => s.isPreview);
+  const setCurrentPage = useEditorStore(s => s.setCurrentPage);
   
   const { setNodeRef, isOver } = useDroppable({
     id: 'canvas',
@@ -21,6 +23,22 @@ export function Canvas() {
   const [isDragOver, setIsDragOver] = useState(false);
   const [scale, setScale] = useState(1);
   const canvasRef = useRef<HTMLDivElement>(null);
+
+  // Prevent default window drag/drop behavior to avoid file open in new tab
+  useEffect(() => {
+    const handleWindowDragOver = (e: DragEvent) => {
+      e.preventDefault();
+    };
+    const handleWindowDrop = (e: DragEvent) => {
+      e.preventDefault();
+    };
+    window.addEventListener('dragover', handleWindowDragOver);
+    window.addEventListener('drop', handleWindowDrop);
+    return () => {
+      window.removeEventListener('dragover', handleWindowDragOver);
+      window.removeEventListener('drop', handleWindowDrop);
+    };
+  }, []);
 
   // HTML5 Drag and Drop for Local Images
   const handleDragOver = useCallback((e: React.DragEvent) => {
@@ -37,12 +55,19 @@ export function Canvas() {
     e.preventDefault();
     setIsDragOver(false);
     const rect = canvasRef.current?.getBoundingClientRect();
-    const x = e.clientX - (rect?.left || 0);
-    const y = e.clientY - (rect?.top || 0);
+    const scrollParent = canvasRef.current?.parentElement;
+    const scrollTop = scrollParent?.scrollTop || 0;
+    const scrollLeft = scrollParent?.scrollLeft || 0;
+
+    const x = (e.clientX - (rect?.left || 0) + scrollLeft) / scale;
+    const y = (e.clientY - (rect?.top || 0) + scrollTop) / scale;
 
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
       const file = e.dataTransfer.files[0];
-      if (file.type.startsWith('image/')) {
+      const isImage = file.type.startsWith('image/') || /\.(gif|jpe?g|tiff?|png|webp|bmp|svg)$/i.test(file.name);
+      const isVideo = file.type.startsWith('video/') || /\.(mp4|webm|ogg|mov|m4v)$/i.test(file.name);
+
+      if (isImage) {
         const reader = new FileReader();
         reader.onload = (event) => {
           if (event.target?.result) {
@@ -50,7 +75,7 @@ export function Canvas() {
           }
         };
         reader.readAsDataURL(file);
-      } else if (file.type.startsWith('video/')) {
+      } else if (isVideo) {
         const reader = new FileReader();
         reader.onload = (event) => {
           if (event.target?.result) {
@@ -60,7 +85,7 @@ export function Canvas() {
         reader.readAsDataURL(file);
       }
     }
-  }, [addComponent]);
+  }, [addComponent, scale]);
 
   // Handle zooming with mouse wheel (holding Ctrl/Cmd)
   useEffect(() => {
@@ -102,7 +127,7 @@ export function Canvas() {
             <div 
               className="w-full h-full outline-none" 
               style={innerStyles}
-              contentEditable={isSelected}
+              contentEditable={isSelected && !isPreview}
               suppressContentEditableWarning
               onBlur={(e) => handleTextEdit(comp.id, e.currentTarget.textContent || '')}
               onClick={(e) => e.stopPropagation()}
@@ -111,10 +136,19 @@ export function Canvas() {
             </div>
           );
         case 'button':
+          const handleBtnClick = () => {
+            if (!isPreview) return;
+            if (comp.props.actionType === 'navigate' && comp.props.actionTarget) {
+              setCurrentPage(comp.props.actionTarget);
+            } else if (comp.props.actionType === 'alert') {
+              alert("Action triggered successfully!");
+            }
+          };
           return (
             <button 
-              className="w-full h-full flex items-center justify-center pointer-events-none" 
+              className={`w-full h-full flex items-center justify-center ${isPreview ? 'pointer-events-auto cursor-pointer hover:opacity-90' : 'pointer-events-none'}`} 
               style={innerStyles}
+              onClick={handleBtnClick}
             >
               {comp.props.text}
             </button>
@@ -139,25 +173,28 @@ export function Canvas() {
         case 'navbar':
           return (
             <div className="w-full h-full flex items-center justify-between" style={innerStyles}>
-               <div className="font-bold text-lg">Logo</div>
+               <div className="font-bold text-lg cursor-pointer" onClick={() => isPreview && setCurrentPage('page-home')}>Logo</div>
                <div className="flex gap-6 text-sm font-medium">
-                 <span>Home</span>
-                 <span>Features</span>
-                 <span>Pricing</span>
+                 <span className="cursor-pointer hover:text-white/80 transition-colors" onClick={() => isPreview && setCurrentPage('page-home')}>Home</span>
+                 <span className="cursor-pointer hover:text-white/80 transition-colors">Features</span>
+                 <span className="cursor-pointer hover:text-white/80 transition-colors" onClick={() => isPreview && setCurrentPage('page-pricing')}>Pricing</span>
                </div>
-               <button className="px-4 py-2 bg-white text-black rounded-md text-sm font-bold">Sign Up</button>
+               <button className="px-4 py-2 bg-white text-black rounded-md text-sm font-bold hover:bg-zinc-200 transition-colors" onClick={() => isPreview && setCurrentPage('page-pricing')}>Sign Up</button>
             </div>
           );
         case 'video':
           return (
-            <div className="w-full h-full flex items-center justify-center relative overflow-hidden" style={innerStyles}>
-              <img src={comp.props.src || "https://images.unsplash.com/photo-1616499370260-485e3e5810e2?q=80&w=2670&auto=format&fit=crop"} className="absolute inset-0 w-full h-full object-cover opacity-50" />
+            <div className="w-full h-full flex items-center justify-center relative overflow-hidden bg-black" style={innerStyles}>
               {comp.props.src ? (
-                 <video src={comp.props.src} className="absolute inset-0 w-full h-full object-cover" autoPlay loop muted />
-              ) : null}
-              <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/30 z-10 cursor-pointer hover:scale-110 transition-transform">
-                <Play className="w-6 h-6 text-white ml-1" fill="currentColor" />
-              </div>
+                 <video src={comp.props.src} className="absolute inset-0 w-full h-full object-cover" autoPlay loop muted playsInline />
+              ) : (
+                 <img src="https://images.unsplash.com/photo-1616499370260-485e3e5810e2?q=80&w=2670&auto=format&fit=crop" className="absolute inset-0 w-full h-full object-cover opacity-50" alt="placeholder" />
+              )}
+              {!comp.props.src && (
+                <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/30 z-10 cursor-pointer hover:scale-110 transition-transform">
+                  <Play className="w-6 h-6 text-white ml-1" fill="currentColor" />
+                </div>
+              )}
             </div>
           );
         case 'pricing':
@@ -174,20 +211,25 @@ export function Canvas() {
                        </div>
                      ))}
                    </div>
-                   <button className={`w-full mt-6 py-2 rounded-lg font-bold text-sm ${i === 1 ? 'bg-indigo-500 text-white' : 'bg-white/10 text-white'}`}>Get Started</button>
+                   <button className={`w-full mt-6 py-2 rounded-lg font-bold text-sm ${i === 1 ? 'bg-indigo-500 text-white' : 'bg-white/10 text-white'} ${isPreview ? 'pointer-events-auto cursor-pointer hover:scale-[1.02] transition-transform' : 'pointer-events-none'}`}>Get Started</button>
                 </div>
               ))}
             </div>
           );
         case 'form':
+          const handleFormSubmit = (e: React.FormEvent) => {
+            e.preventDefault();
+            if (!isPreview) return;
+            alert("Form submitted successfully!");
+          };
           return (
-            <div className="w-full h-full flex flex-col gap-4 text-white" style={innerStyles}>
+            <form onSubmit={handleFormSubmit} className="w-full h-full flex flex-col gap-4 text-white" style={innerStyles}>
               <h3 className="text-xl font-bold">Contact Us</h3>
-              <input type="text" placeholder="Name" className="bg-zinc-900 border border-zinc-800 rounded-lg px-4 py-2 text-sm outline-none focus:border-indigo-500" />
-              <input type="email" placeholder="Email" className="bg-zinc-900 border border-zinc-800 rounded-lg px-4 py-2 text-sm outline-none focus:border-indigo-500" />
-              <textarea placeholder="Message" className="bg-zinc-900 border border-zinc-800 rounded-lg px-4 py-2 text-sm outline-none focus:border-indigo-500 flex-1 min-h-[80px]" />
-              <button className="bg-white text-black font-bold py-2 rounded-lg">Submit</button>
-            </div>
+              <input type="text" placeholder="Name" required className={`bg-zinc-900 border border-zinc-800 rounded-lg px-4 py-2 text-sm outline-none focus:border-indigo-500 ${isPreview ? 'pointer-events-auto' : 'pointer-events-none'}`} />
+              <input type="email" placeholder="Email" required className={`bg-zinc-900 border border-zinc-800 rounded-lg px-4 py-2 text-sm outline-none focus:border-indigo-500 ${isPreview ? 'pointer-events-auto' : 'pointer-events-none'}`} />
+              <textarea placeholder="Message" required className={`bg-zinc-900 border border-zinc-800 rounded-lg px-4 py-2 text-sm outline-none focus:border-indigo-500 flex-1 min-h-[80px] ${isPreview ? 'pointer-events-auto' : 'pointer-events-none'}`} />
+              <button type="submit" className={`bg-white text-black font-bold py-2 rounded-lg ${isPreview ? 'pointer-events-auto cursor-pointer hover:bg-zinc-200' : 'pointer-events-none'}`}>Submit</button>
+            </form>
           );
         case 'cart':
           return (
@@ -244,7 +286,6 @@ export function Canvas() {
         case 'flex':
           return (
             <div className="w-full h-full relative" style={innerStyles}>
-               {/* Empty structural elements */}
                {comp.type === 'grid' && (
                  <>
                    <div className="border border-white/10 rounded"></div>
@@ -263,6 +304,7 @@ export function Canvas() {
       }
     })();
 
+    // Rnd drag bounds is parent
     return (
       <Rnd
         key={comp.id}
@@ -282,18 +324,37 @@ export function Canvas() {
             }
           });
         }}
-        onClick={(e: any) => { e.stopPropagation(); selectComponent(comp.id); }}
-        className={`group transition-shadow ${isSelected ? 'ring-2 ring-indigo-500 shadow-[0_0_0_4px_rgba(99,102,241,0.2)]' : 'hover:ring-1 hover:ring-indigo-500/50'}`}
+        onClick={(e: any) => { 
+          if (isPreview) return;
+          e.stopPropagation(); 
+          selectComponent(comp.id); 
+        }}
+        className={isPreview ? '' : `group transition-shadow ${isSelected ? 'ring-2 ring-indigo-500 shadow-[0_0_0_4px_rgba(99,102,241,0.2)]' : 'hover:ring-1 hover:ring-indigo-500/50'}`}
         style={{ zIndex: isSelected ? 50 : 10 }}
         dragHandleClassName="rnd-drag-handle"
-        enableResizing={isSelected}
+        enableResizing={isSelected && !isPreview}
+        disableDragging={isPreview}
       >
         <div className="w-full h-full relative rnd-drag-handle cursor-move">
           {innerContent}
+          {/* Overlay to intercept drag/click events. Active ONLY in design mode, disabled when editing text. */}
+          {!(comp.type === 'text' && isSelected) && !isPreview && (
+            <div className="absolute inset-0 z-20" />
+          )}
         </div>
       </Rnd>
     );
   };
+
+  // Calculate dynamic canvas height to wrap all absolute components
+  const canvasHeight = Math.max(
+    800,
+    ...components.map(c => {
+      const y = Number(c.position.y) || 0;
+      const h = Number(c.position.height) || (typeof c.position.height === 'string' ? parseInt(c.position.height) : 0) || 0;
+      return y + h;
+    })
+  );
   
   return (
     <div className="w-full h-full overflow-hidden bg-[#0a0a0a] relative canvas-grid">
@@ -306,7 +367,7 @@ export function Canvas() {
           <motion.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="w-[1200px] h-[800px] bg-zinc-950 rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.8)] relative border border-white/10 overflow-hidden"
+            className="w-[1200px] h-[800px] bg-zinc-950 rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.8)] relative border border-white/10 overflow-y-auto overflow-x-hidden custom-scrollbar"
           >
             {/* Real Canvas Content */}
             <div 
@@ -318,7 +379,8 @@ export function Canvas() {
               onDragLeave={handleDragLeave}
               onDrop={handleDrop}
               onClick={() => selectComponent(null)}
-              className={`w-full h-full text-zinc-300 relative transition-colors ${isOver || isDragOver ? 'bg-indigo-500/10' : ''}`}
+              style={{ height: `${canvasHeight}px` }}
+              className={`w-full text-zinc-300 relative transition-colors ${isOver || isDragOver ? 'bg-indigo-500/10' : ''}`}
             >
               {components.map(renderComponent)}
 

@@ -1,4 +1,4 @@
-import { Type, Image, GripVertical, Search, Box, Grid, MousePointer2, Layers, Wand2, Video, LayoutTemplate, FormInput, ShoppingCart } from 'lucide-react';
+import { Type, Image, GripVertical, Search, Box, Grid, MousePointer2, Layers, Wand2, Video, LayoutTemplate, FormInput, ShoppingCart, Trash2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useDraggable } from '@dnd-kit/core';
 import { useEditorStore } from '../store/useEditorStore';
@@ -34,6 +34,7 @@ export function Sidebar() {
   const currentPageId = useEditorStore(s => s.currentPageId);
   const components = pages.find(p => p.id === currentPageId)?.components || [];
   const selectComponent = useEditorStore(s => s.selectComponent);
+  const removeComponent = useEditorStore(s => s.removeComponent);
   const selectedId = useEditorStore(s => s.selectedId);
 
   const categories = [
@@ -126,7 +127,7 @@ export function Sidebar() {
             <div 
               key={comp.id}
               onClick={() => selectComponent(comp.id)}
-              className={`flex items-center justify-between p-2 rounded-lg cursor-pointer transition-colors ${
+              className={`flex items-center justify-between p-2 rounded-lg cursor-pointer transition-colors group/layer ${
                 selectedId === comp.id ? 'bg-indigo-500/10 border border-indigo-500/20 text-white' : 'hover:bg-zinc-800/50 text-zinc-400 hover:text-white border border-transparent'
               }`}
             >
@@ -134,7 +135,16 @@ export function Sidebar() {
                 <GripVertical className={`w-3 h-3 ${selectedId === comp.id ? 'text-indigo-400/50' : 'text-zinc-600'}`} />
                 <span className="font-medium text-xs capitalize">{comp.type}</span>
               </div>
-              {selectedId === comp.id && <span className="w-2 h-2 rounded-full bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.8)]"></span>}
+              <div className="flex items-center gap-2">
+                <button 
+                  onClick={(e) => { e.stopPropagation(); removeComponent(comp.id); }} 
+                  className="opacity-0 group-hover/layer:opacity-100 p-1 text-zinc-500 hover:text-red-400 hover:bg-red-500/10 rounded transition-all"
+                  title="Delete layer"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                </button>
+                {selectedId === comp.id && <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.8)]"></span>}
+              </div>
             </div>
           ))}
         </div>

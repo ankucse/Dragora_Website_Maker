@@ -55,6 +55,7 @@ export function PropertiesPanel() {
       };
       reader.readAsDataURL(file);
     }
+    e.target.value = ''; // Reset input to allow selecting same file
   };
 
   return (
@@ -121,12 +122,12 @@ export function PropertiesPanel() {
             </div>
           )}
           
-          {comp.props.src !== undefined && (
+          {(comp.type === 'image' || comp.type === 'video') && (
             <div className="space-y-1.5">
               <label className="text-[10px] text-zinc-500 font-medium">Media Source (URL or Upload)</label>
               <div className="flex gap-2">
-                <input type="text" value={comp.props.src} onChange={(e) => handlePropChange('src', e.target.value)} className="w-full bg-zinc-900/80 border border-white/10 rounded-lg p-2 text-xs focus:border-indigo-500 outline-none text-white transition-colors" />
-                <button onClick={() => fileInputRef.current?.click()} className="p-2 bg-indigo-500/20 text-indigo-400 rounded-lg hover:bg-indigo-500/40 border border-indigo-500/50 transition-colors">
+                <input type="text" value={comp.props.src || ''} onChange={(e) => handlePropChange('src', e.target.value)} className="w-full bg-zinc-900/80 border border-white/10 rounded-lg p-2 text-xs focus:border-indigo-500 outline-none text-white transition-colors" />
+                <button onClick={() => fileInputRef.current?.click()} className="p-2 bg-indigo-500/20 text-indigo-400 rounded-lg hover:bg-indigo-500/40 border border-indigo-500/50 transition-colors shrink-0">
                   <Upload className="w-4 h-4" />
                 </button>
                 <input type="file" ref={fileInputRef} onChange={handleFileUpload} accept="image/*,video/*" className="hidden" />
