@@ -90,6 +90,33 @@ export const useEditorStore = create<EditorState>((set) => ({
     } else if (type === 'navbar') {
       defaultStyles = { backgroundColor: '#0a0a0a', borderBottom: '1px solid #1f1f1f', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 24px', color: '#ffffff' };
       position = { x: 0, y: 0, width: 1000, height: 60, absolute: true };
+    } else if (type === 'pricing') {
+      defaultStyles = { display: 'flex', gap: '24px', padding: '24px' };
+      position = { x, y, width: 900, height: 500, absolute: true };
+    } else if (type === 'video') {
+      defaultStyles = { backgroundColor: '#18181b', borderRadius: '12px' };
+      position = { x, y, width: 640, height: 360, absolute: true };
+    } else if (type === 'form') {
+      defaultStyles = { backgroundColor: '#09090b', padding: '32px', borderRadius: '16px', border: '1px solid #27272a' };
+      position = { x, y, width: 400, height: 400, absolute: true };
+    } else if (type === 'cart') {
+      defaultStyles = { backgroundColor: '#ffffff', padding: '24px', borderRadius: '12px', color: '#000000' };
+      position = { x, y, width: 350, height: 500, absolute: true };
+    } else if (type === 'section') {
+      defaultStyles = { backgroundColor: 'transparent', border: '1px dashed rgba(255,255,255,0.2)' };
+      position = { x, y, width: 800, height: 300, absolute: true };
+    } else if (type === 'grid') {
+      defaultStyles = { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', border: '1px dashed rgba(255,255,255,0.2)' };
+      position = { x, y, width: 600, height: 300, absolute: true };
+    } else if (type === 'flex') {
+      defaultStyles = { display: 'flex', gap: '16px', border: '1px dashed rgba(255,255,255,0.2)' };
+      position = { x, y, width: 600, height: 200, absolute: true };
+    } else if (type === 'container') {
+      defaultStyles = { border: '1px dashed rgba(255,255,255,0.2)' };
+      position = { x, y, width: 400, height: 400, absolute: true };
+    } else if (type === 'megamenu') {
+      defaultStyles = { backgroundColor: '#18181b', borderRadius: '12px', border: '1px solid #27272a', padding: '24px', color: '#ffffff' };
+      position = { x, y, width: 800, height: 300, absolute: true };
     }
 
     const newComponent: ComponentData = {

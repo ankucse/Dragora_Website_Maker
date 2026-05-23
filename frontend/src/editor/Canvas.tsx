@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { useDroppable } from '@dnd-kit/core';
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { Rnd } from 'react-rnd';
+import { Play, Check, ShoppingCart } from 'lucide-react';
 
 export function Canvas() {
   const components = useEditorStore(s => s.components);
@@ -131,13 +132,116 @@ export function Canvas() {
                  <span>Features</span>
                  <span>Pricing</span>
                </div>
-               <button className="px-4 py-2 bg-black text-white rounded-md text-sm font-bold">Sign Up</button>
+               <button className="px-4 py-2 bg-white text-black rounded-md text-sm font-bold">Sign Up</button>
+            </div>
+          );
+        case 'video':
+          return (
+            <div className="w-full h-full flex items-center justify-center relative overflow-hidden" style={innerStyles}>
+              <img src="https://images.unsplash.com/photo-1616499370260-485e3e5810e2?q=80&w=2670&auto=format&fit=crop" className="absolute inset-0 w-full h-full object-cover opacity-50" />
+              <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/30 z-10 cursor-pointer hover:scale-110 transition-transform">
+                <Play className="w-6 h-6 text-white ml-1" fill="currentColor" />
+              </div>
+            </div>
+          );
+        case 'pricing':
+          return (
+            <div className="w-full h-full flex gap-6" style={innerStyles}>
+              {[ 'Basic', 'Pro', 'Enterprise' ].map((plan, i) => (
+                <div key={plan} className={`flex-1 rounded-2xl p-6 border ${i === 1 ? 'border-indigo-500 bg-indigo-500/10' : 'border-white/10 bg-zinc-900/50'} flex flex-col`}>
+                   <h3 className="text-xl font-bold text-white">{plan}</h3>
+                   <div className="mt-4 text-3xl font-bold text-white">${i === 0 ? '9' : i === 1 ? '29' : '99'}<span className="text-sm text-zinc-500 font-normal">/mo</span></div>
+                   <div className="mt-6 space-y-3 flex-1">
+                     {[1,2,3].map(f => (
+                       <div key={f} className="flex items-center gap-2 text-sm text-zinc-300">
+                         <Check className="w-4 h-4 text-indigo-400" /> Feature {f}
+                       </div>
+                     ))}
+                   </div>
+                   <button className={`w-full mt-6 py-2 rounded-lg font-bold text-sm ${i === 1 ? 'bg-indigo-500 text-white' : 'bg-white/10 text-white'}`}>Get Started</button>
+                </div>
+              ))}
+            </div>
+          );
+        case 'form':
+          return (
+            <div className="w-full h-full flex flex-col gap-4 text-white" style={innerStyles}>
+              <h3 className="text-xl font-bold">Contact Us</h3>
+              <input type="text" placeholder="Name" className="bg-zinc-900 border border-zinc-800 rounded-lg px-4 py-2 text-sm outline-none focus:border-indigo-500" />
+              <input type="email" placeholder="Email" className="bg-zinc-900 border border-zinc-800 rounded-lg px-4 py-2 text-sm outline-none focus:border-indigo-500" />
+              <textarea placeholder="Message" className="bg-zinc-900 border border-zinc-800 rounded-lg px-4 py-2 text-sm outline-none focus:border-indigo-500 flex-1 min-h-[80px]" />
+              <button className="bg-white text-black font-bold py-2 rounded-lg">Submit</button>
+            </div>
+          );
+        case 'cart':
+          return (
+            <div className="w-full h-full flex flex-col" style={innerStyles}>
+              <div className="flex items-center justify-between border-b border-gray-200 pb-4 mb-4">
+                <h3 className="font-bold text-lg flex items-center gap-2"><ShoppingCart className="w-5 h-5" /> Your Cart</h3>
+                <span className="bg-black text-white text-xs px-2 py-1 rounded-full">3 items</span>
+              </div>
+              <div className="flex-1 space-y-4">
+                 {[1,2].map(i => (
+                   <div key={i} className="flex gap-3">
+                     <div className="w-16 h-16 bg-gray-100 rounded-md"></div>
+                     <div>
+                       <div className="font-medium text-sm">Premium Product {i}</div>
+                       <div className="text-gray-500 text-xs">$99.00</div>
+                     </div>
+                   </div>
+                 ))}
+              </div>
+              <button className="w-full bg-black text-white py-3 rounded-lg font-bold mt-4">Checkout - $198.00</button>
+            </div>
+          );
+        case 'megamenu':
+          return (
+             <div className="w-full h-full flex flex-col" style={innerStyles}>
+                <div className="flex gap-8 mb-6 border-b border-zinc-800 pb-4">
+                  <span className="font-bold text-indigo-400 border-b-2 border-indigo-400 pb-4 -mb-[17px]">Products</span>
+                  <span className="text-zinc-400">Solutions</span>
+                  <span className="text-zinc-400">Resources</span>
+                </div>
+                <div className="flex gap-8 flex-1">
+                   <div className="flex-1 space-y-4">
+                     <h4 className="text-xs font-bold text-zinc-500 uppercase">Core</h4>
+                     <div className="font-bold">Database</div>
+                     <div className="font-bold">Authentication</div>
+                     <div className="font-bold">Storage</div>
+                   </div>
+                   <div className="flex-1 space-y-4">
+                     <h4 className="text-xs font-bold text-zinc-500 uppercase">Tools</h4>
+                     <div className="font-bold">Edge Functions</div>
+                     <div className="font-bold">Realtime</div>
+                     <div className="font-bold">Vector</div>
+                   </div>
+                   <div className="flex-1 bg-zinc-900 rounded-lg p-4">
+                      <h4 className="font-bold text-sm mb-2">New Release</h4>
+                      <p className="text-xs text-zinc-400">Check out our latest AI features.</p>
+                   </div>
+                </div>
+             </div>
+          );
+        case 'section':
+        case 'container':
+        case 'grid':
+        case 'flex':
+          return (
+            <div className="w-full h-full relative" style={innerStyles}>
+               {/* Empty structural elements */}
+               {comp.type === 'grid' && (
+                 <>
+                   <div className="border border-white/10 rounded"></div>
+                   <div className="border border-white/10 rounded"></div>
+                 </>
+               )}
             </div>
           );
         default:
           return (
-            <div className="w-full h-full p-4 border border-dashed border-gray-300 bg-gray-50/50 flex items-center justify-center text-gray-500 backdrop-blur-sm" style={innerStyles}>
-              {comp.type} Block
+            <div className="w-full h-full p-4 border border-dashed border-zinc-700 bg-zinc-900/50 flex flex-col items-center justify-center text-zinc-500 backdrop-blur-sm rounded-xl" style={innerStyles}>
+              <span className="text-xs uppercase tracking-widest font-bold mb-1">{comp.type} Component</span>
+              <span className="text-[10px]">Ready for configuration</span>
             </div>
           );
       }
