@@ -1,7 +1,35 @@
 import { Type, Image, AlignLeft, GripVertical, Search, Box, Grid, MousePointer2, Sparkles, Layers, Wand2 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useDraggable } from '@dnd-kit/core';
+import { useEditorStore } from '../store/useEditorStore';
+
+function DraggableItem({ id, label, icon }: { id: string, label: string, icon: React.ReactNode }) {
+  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
+    id: `sidebar-${id}`,
+    data: { type: id }
+  });
+
+  return (
+    <div 
+      ref={setNodeRef}
+      {...listeners}
+      {...attributes}
+      className={`flex flex-col items-center justify-center p-4 rounded-xl border ${isDragging ? 'border-indigo-500 bg-indigo-500/20' : 'border-white/5 bg-zinc-900/30'} hover:bg-zinc-800 hover:border-indigo-500/30 transition-all cursor-grab active:cursor-grabbing group shadow-sm z-50`}
+      style={{ opacity: isDragging ? 0.5 : 1 }}
+    >
+      <div className="mb-2 p-2.5 rounded-lg bg-zinc-950 group-hover:scale-110 transition-transform shadow-inner border border-white/5">
+        {icon}
+      </div>
+      <span className="text-[10px] font-medium text-zinc-400 group-hover:text-white transition-colors">{label}</span>
+    </div>
+  );
+}
 
 export function Sidebar() {
+  const components = useEditorStore(s => s.components);
+  const selectComponent = useEditorStore(s => s.selectComponent);
+  const selectedId = useEditorStore(s => s.selectedId);
+
   const categories = [
     {
       name: "Layout & Structure",
@@ -52,21 +80,13 @@ export function Sidebar() {
           />
         </div>
 
-        <div className="space-y-6 overflow-y-auto custom-scrollbar pr-2 h-[calc(100vh-400px)]">
+        <div className="space-y-6 overflow-y-auto custom-scrollbar pr-2 h-[calc(100vh-450px)]">
           {categories.map((cat, i) => (
             <div key={i}>
               <h4 className="text-[10px] font-semibold text-zinc-600 mb-3">{cat.name}</h4>
               <div className="grid grid-cols-2 gap-2">
                 {cat.items.map(el => (
-                  <div 
-                    key={el.id}
-                    className="flex flex-col items-center justify-center p-4 rounded-xl border border-white/5 bg-zinc-900/30 hover:bg-zinc-800 hover:border-indigo-500/30 transition-all cursor-grab active:cursor-grabbing group shadow-sm"
-                  >
-                    <div className="mb-2 p-2.5 rounded-lg bg-zinc-950 group-hover:scale-110 transition-transform shadow-inner border border-white/5">
-                      {el.icon}
-                    </div>
-                    <span className="text-[10px] font-medium text-zinc-400 group-hover:text-white transition-colors">{el.label}</span>
-                  </div>
+                  <DraggableItem key={el.id} id={el.id} label={el.label} icon={el.icon} />
                 ))}
               </div>
             </div>
@@ -74,29 +94,27 @@ export function Sidebar() {
         </div>
       </div>
       
-      <div className="flex-1 border-t border-white/10 pt-6 relative">
+      <div className="flex-1 border-t border-white/10 pt-6 relative overflow-y-auto custom-scrollbar">
         <h3 className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-4 flex items-center gap-2">
           <GripVertical className="w-3 h-3" /> Layer Tree
         </h3>
         <div className="space-y-1">
-          <div className="flex items-center justify-between p-2 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-white text-xs cursor-pointer">
-            <div className="flex items-center gap-2">
-              <GripVertical className="w-3 h-3 text-indigo-400/50" />
-              <Grid className="w-3.5 h-3.5 text-indigo-400" />
-              <span className="font-medium">Hero Mesh Grid</span>
+          {components.length === 0 && <p className="text-xs text-zinc-600 italic px-2">No layers yet.</p>}
+          {components.map(comp => (
+            <div 
+              key={comp.id}
+              onClick={() => selectComponent(comp.id)}
+              className={`flex items-center justify-between p-2 rounded-lg cursor-pointer transition-colors ${
+                selectedId === comp.id ? 'bg-indigo-500/10 border border-indigo-500/20 text-white' : 'hover:bg-zinc-800/50 text-zinc-400 hover:text-white border border-transparent'
+              }`}
+            >
+              <div className="flex items-center gap-2">
+                <GripVertical className={`w-3 h-3 ${selectedId === comp.id ? 'text-indigo-400/50' : 'text-zinc-600'}`} />
+                <span className="font-medium text-xs capitalize">{comp.type}</span>
+              </div>
+              {selectedId === comp.id && <span className="w-2 h-2 rounded-full bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.8)]"></span>}
             </div>
-            <span className="w-2 h-2 rounded-full bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.8)]"></span>
-          </div>
-          <div className="flex items-center gap-2 p-2 rounded-lg hover:bg-zinc-800/50 text-zinc-400 hover:text-white text-xs cursor-pointer ml-4 transition-colors">
-            <GripVertical className="w-3 h-3 text-zinc-600" />
-            <Type className="w-3.5 h-3.5" />
-            Display Heading
-          </div>
-          <div className="flex items-center gap-2 p-2 rounded-lg hover:bg-zinc-800/50 text-zinc-400 hover:text-white text-xs cursor-pointer ml-4 transition-colors">
-            <GripVertical className="w-3 h-3 text-zinc-600" />
-            <MousePointer2 className="w-3.5 h-3.5" />
-            Magnetic CTA Button
-          </div>
+          ))}
         </div>
       </div>
     </motion.div>
