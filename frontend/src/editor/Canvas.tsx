@@ -6,7 +6,9 @@ import { Rnd } from 'react-rnd';
 import { Play, Check, ShoppingCart } from 'lucide-react';
 
 export function Canvas() {
-  const components = useEditorStore(s => s.components);
+  const pages = useEditorStore(s => s.pages);
+  const currentPageId = useEditorStore(s => s.currentPageId);
+  const components = pages.find(p => p.id === currentPageId)?.components || [];
   const selectedId = useEditorStore(s => s.selectedId);
   const selectComponent = useEditorStore(s => s.selectComponent);
   const addComponent = useEditorStore(s => s.addComponent);
@@ -45,6 +47,14 @@ export function Canvas() {
         reader.onload = (event) => {
           if (event.target?.result) {
             addComponent('image', { src: event.target.result as string }, x, y);
+          }
+        };
+        reader.readAsDataURL(file);
+      } else if (file.type.startsWith('video/')) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          if (event.target?.result) {
+            addComponent('video', { src: event.target.result as string }, x, y);
           }
         };
         reader.readAsDataURL(file);
@@ -102,7 +112,10 @@ export function Canvas() {
           );
         case 'button':
           return (
-            <button className="w-full h-full flex items-center justify-center" style={innerStyles}>
+            <button 
+              className="w-full h-full flex items-center justify-center pointer-events-none" 
+              style={innerStyles}
+            >
               {comp.props.text}
             </button>
           );
@@ -138,7 +151,10 @@ export function Canvas() {
         case 'video':
           return (
             <div className="w-full h-full flex items-center justify-center relative overflow-hidden" style={innerStyles}>
-              <img src="https://images.unsplash.com/photo-1616499370260-485e3e5810e2?q=80&w=2670&auto=format&fit=crop" className="absolute inset-0 w-full h-full object-cover opacity-50" />
+              <img src={comp.props.src || "https://images.unsplash.com/photo-1616499370260-485e3e5810e2?q=80&w=2670&auto=format&fit=crop"} className="absolute inset-0 w-full h-full object-cover opacity-50" />
+              {comp.props.src ? (
+                 <video src={comp.props.src} className="absolute inset-0 w-full h-full object-cover" autoPlay loop muted />
+              ) : null}
               <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/30 z-10 cursor-pointer hover:scale-110 transition-transform">
                 <Play className="w-6 h-6 text-white ml-1" fill="currentColor" />
               </div>

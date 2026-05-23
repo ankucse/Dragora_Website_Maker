@@ -1,10 +1,17 @@
 import { useEditorStore } from '../store/useEditorStore';
-import { Layout, Trash2, Box, Eye } from 'lucide-react';
+import { Layout, Trash2, Box, Eye, Link, Upload } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useRef } from 'react';
 
 export function PropertiesPanel() {
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const selectedId = useEditorStore(s => s.selectedId);
-  const components = useEditorStore(s => s.components);
+  const pages = useEditorStore(s => s.pages);
+  const currentPageId = useEditorStore(s => s.currentPageId);
+  const components = useEditorStore(s => {
+    const page = s.pages.find(p => p.id === s.currentPageId);
+    return page ? page.components : [];
+  });
   const updateComponent = useEditorStore(s => s.updateComponent);
   const removeComponent = useEditorStore(s => s.removeComponent);
 
@@ -36,6 +43,19 @@ export function PropertiesPanel() {
 
   const handlePropChange = (key: string, value: string) => {
     updateComponent(comp.id, { props: { ...comp.props, [key]: value } });
+  };
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        if (event.target?.result) {
+          handlePropChange('src', event.target.result as string);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   return (
@@ -104,9 +124,43 @@ export function PropertiesPanel() {
           
           {comp.props.src !== undefined && (
             <div className="space-y-1.5">
-              <label className="text-[10px] text-zinc-500 font-medium">Image URL</label>
-              <input type="text" value={comp.props.src} onChange={(e) => handlePropChange('src', e.target.value)} className="w-full bg-zinc-900/80 border border-white/10 rounded-lg p-2 text-xs focus:border-indigo-500 outline-none text-white transition-colors" />
+              <label className="text-[10px] text-zinc-500 font-medium">Media Source (URL or Upload)</label>
+              <div className="flex gap-2">
+                <input type="text" value={comp.props.src} onChange={(e) => handlePropChange('src', e.target.value)} className="w-full bg-zinc-900/80 border border-white/10 rounded-lg p-2 text-xs focus:border-indigo-500 outline-none text-white transition-colors" />
+                <button onClick={() => fileInputRef.current?.click()} className="p-2 bg-indigo-500/20 text-indigo-400 rounded-lg hover:bg-indigo-500/40 border border-indigo-500/50 transition-colors">
+                  <Upload className="w-4 h-4" />
+                </button>
+                <input type="file" ref={fileInputRef} onChange={handleFileUpload} accept="image/*,video/*" className="hidden" />
+              </div>
             </div>
+          )}
+          
+          {(comp.type === 'button' || comp.type === 'form') && (
+             <div className="space-y-3 pt-4 border-t border-white/10">
+               <div className="flex items-center gap-2 text-[10px] font-bold text-zinc-500 uppercase tracking-widest">
+                 <Link className="w-3 h-3" /> Actions
+               </div>
+               <div className="space-y-1.5">
+                 <label className="text-[10px] text-zinc-500 font-medium">On Click</label>
+                 <select value={comp.props.actionType || 'none'} onChange={(e) => handlePropChange('actionType', e.target.value)} className="w-full bg-zinc-900/80 border border-white/10 rounded-lg p-2 text-xs focus:border-indigo-500 outline-none text-white transition-colors">
+                   <option value="none">None</option>
+                   <option value="navigate">Navigate to Page</option>
+                   <option value="alert">Show Success Alert</option>
+                 </select>
+               </div>
+               
+               {comp.props.actionType === 'navigate' && (
+                 <div className="space-y-1.5">
+                   <label className="text-[10px] text-zinc-500 font-medium">Target Page</label>
+                   <select value={comp.props.actionTarget || ''} onChange={(e) => handlePropChange('actionTarget', e.target.value)} className="w-full bg-zinc-900/80 border border-white/10 rounded-lg p-2 text-xs focus:border-indigo-500 outline-none text-white transition-colors">
+                     <option value="">Select a page...</option>
+                     {pages.map(p => (
+                       <option key={p.id} value={p.id}>{p.name}</option>
+                     ))}
+                   </select>
+                 </div>
+               )}
+             </div>
           )}
         </div>
 

@@ -13,7 +13,10 @@ import { useState, useEffect } from 'react';
 export default function EditorPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const addComponent = useEditorStore(s => s.addComponent);
+  const pages = useEditorStore(s => s.pages);
+  const currentPageId = useEditorStore(s => s.currentPageId);
+  const setCurrentPage = useEditorStore(s => s.setCurrentPage);
+  const addPage = useEditorStore(s => s.addPage);
   const undo = useEditorStore(s => s.undo);
   const redo = useEditorStore(s => s.redo);
   const pastCount = useEditorStore(s => s.past.length);
@@ -50,8 +53,7 @@ export default function EditorPage() {
     
     if (over && over.id === 'canvas') {
       const typeStr = active.id.toString().replace('sidebar-', '');
-      // Calculate drop position relative to canvas
-      // For now, dropping from sidebar spawns at center (300, 300) since react-rnd takes over
+      const addComponent = useEditorStore.getState().addComponent;
       addComponent(typeStr as ComponentType, {}, 300, 300);
     }
   };
@@ -70,6 +72,28 @@ export default function EditorPage() {
             <ArrowLeft className="w-5 h-5" />
           </button>
           
+          <div className="w-[1px] h-6 bg-white/10"></div>
+
+          {/* Device Toggles */}
+          <div className="flex items-center gap-1 bg-zinc-950 p-1 rounded-full border border-white/5">
+            <select 
+              value={currentPageId}
+              onChange={(e) => setCurrentPage(e.target.value)}
+              className="bg-transparent text-sm font-bold text-white outline-none px-2 cursor-pointer"
+            >
+              {pages.map(p => <option key={p.id} value={p.id} className="bg-zinc-900 text-sm">{p.name}</option>)}
+            </select>
+            <button 
+              onClick={() => {
+                const name = prompt("Enter new page name:");
+                if (name) addPage(name);
+              }}
+              className="ml-2 text-xs text-indigo-400 hover:text-indigo-300 font-bold px-2 border-l border-white/10"
+            >
+              + New
+            </button>
+          </div>
+
           <div className="w-[1px] h-6 bg-white/10"></div>
 
           {/* Device Toggles */}
