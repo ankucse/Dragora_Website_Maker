@@ -70,7 +70,7 @@ export const useEditorStore = create<EditorState>((set) => ({
       position = { x, y, width: 120, height: 48, absolute: true };
     } else if (type === 'text') {
       defaultProps = { text: 'Double click to edit text...' };
-      defaultStyles = { fontSize: '16px', color: '#333333' };
+      defaultStyles = { fontSize: '16px', color: '#ffffff' };
       position = { x, y, width: 250, height: 50, absolute: true };
     } else if (type === 'image') {
       defaultProps = { src: props.src || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop', alt: 'Image' };
@@ -88,7 +88,7 @@ export const useEditorStore = create<EditorState>((set) => ({
       };
       position = { x, y, width: 320, height: 400, absolute: true };
     } else if (type === 'navbar') {
-      defaultStyles = { backgroundColor: '#ffffff', borderBottom: '1px solid #eaeaea', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 24px' };
+      defaultStyles = { backgroundColor: '#0a0a0a', borderBottom: '1px solid #1f1f1f', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 24px', color: '#ffffff' };
       position = { x: 0, y: 0, width: 1000, height: 60, absolute: true };
     }
 

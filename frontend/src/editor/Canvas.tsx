@@ -186,7 +186,7 @@ export function Canvas() {
           <motion.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="w-[1200px] h-[800px] bg-white rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] relative border border-white/20 overflow-hidden"
+            className="w-[1200px] h-[800px] bg-zinc-950 rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.8)] relative border border-white/10 overflow-hidden"
           >
             {/* Real Canvas Content */}
             <div 
@@ -198,13 +198,13 @@ export function Canvas() {
               onDragLeave={handleDragLeave}
               onDrop={handleDrop}
               onClick={() => selectComponent(null)}
-              className={`w-full h-full text-black relative transition-colors ${isOver || isDragOver ? 'bg-indigo-50' : ''}`}
+              className={`w-full h-full text-zinc-300 relative transition-colors ${isOver || isDragOver ? 'bg-indigo-500/10' : ''}`}
             >
               {components.map(renderComponent)}
 
               {components.length === 0 && (
                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                   <div className="px-6 py-4 rounded-full bg-indigo-50 text-indigo-600 font-medium border border-indigo-100 flex items-center gap-2 shadow-sm animate-pulse">
+                   <div className="px-6 py-4 rounded-full bg-indigo-500/20 text-indigo-300 font-medium border border-indigo-500/30 flex items-center gap-2 shadow-sm animate-pulse backdrop-blur-md">
                      <span className="w-2 h-2 rounded-full bg-indigo-500"></span>
                      Drop elements or images here (Use Ctrl+Wheel to Zoom)
                    </div>

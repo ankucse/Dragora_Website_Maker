@@ -2,13 +2,13 @@ import { Sidebar } from '../editor/Sidebar';
 import { Canvas } from '../editor/Canvas';
 import { PropertiesPanel } from '../editor/PropertiesPanel';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Play, Globe, Smartphone, Monitor, Tablet, Undo2, Redo2 } from 'lucide-react';
+import { ArrowLeft, Play, Globe, Smartphone, Monitor, Tablet, Undo2, Redo2, Box } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { DndContext } from '@dnd-kit/core';
-import type { DragEndEvent } from '@dnd-kit/core';
+import { DndContext, DragOverlay } from '@dnd-kit/core';
+import type { DragStartEvent, DragEndEvent } from '@dnd-kit/core';
 import { useEditorStore } from '../store/useEditorStore';
 import type { ComponentType } from '../store/useEditorStore';
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function EditorPage() {
   const { id } = useParams();
@@ -38,10 +38,16 @@ export default function EditorPage() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [undo, redo]);
 
+  const [activeId, setActiveId] = useState<string | null>(null);
+
+  const handleDragStart = (event: DragStartEvent) => {
+    setActiveId(event.active.id.toString());
+  };
+
   const handleDragEnd = (event: DragEndEvent) => {
+    setActiveId(null);
     const { over, active } = event;
     
-    // If dropped over the canvas
     if (over && over.id === 'canvas') {
       const typeStr = active.id.toString().replace('sidebar-', '');
       // Calculate drop position relative to canvas
@@ -51,7 +57,7 @@ export default function EditorPage() {
   };
 
   return (
-    <DndContext onDragEnd={handleDragEnd}>
+    <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
       <div className="h-screen w-screen bg-[#0a0a0a] flex flex-col overflow-hidden font-sans text-zinc-300">
         {/* Floating Pill Toolbar */}
         <motion.div 
@@ -110,6 +116,17 @@ export default function EditorPage() {
           </div>
           <PropertiesPanel />
         </div>
+
+        <DragOverlay dropAnimation={null}>
+          {activeId ? (
+            <div className="flex flex-col items-center justify-center p-3 rounded-xl border border-indigo-500 bg-indigo-500/20 shadow-xl opacity-90 scale-105 cursor-grabbing" style={{ width: '100px', height: '100px' }}>
+              <div className="mb-1.5 p-2 rounded-lg bg-zinc-950 shadow-inner border border-white/5">
+                <Box className="w-5 h-5 text-indigo-400" />
+              </div>
+              <span className="text-[10px] font-medium text-white capitalize">{activeId.replace('sidebar-', '')}</span>
+            </div>
+          ) : null}
+        </DragOverlay>
       </div>
     </DndContext>
   );
