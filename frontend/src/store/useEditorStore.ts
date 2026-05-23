@@ -57,64 +57,110 @@ const defaultUnicornHome: Page = {
       id: 'mesh-bg',
       type: 'mesh',
       props: {},
-      styles: { opacity: 0.8 },
-      position: { x: 0, y: 0, width: 1200, height: 800, absolute: true }
+      styles: { 
+        background: 'radial-gradient(circle at 15% 50%, rgba(79, 70, 229, 0.25), transparent 25%), radial-gradient(circle at 85% 30%, rgba(236, 72, 153, 0.2), transparent 25%), radial-gradient(circle at 50% 80%, rgba(14, 165, 233, 0.15), transparent 30%), #0a0a0a',
+        opacity: 1 
+      },
+      position: { x: 0, y: 0, width: 1200, height: 1000, absolute: true }
     },
     {
       id: 'nav-1',
       type: 'navbar',
       props: {},
-      styles: { backgroundColor: 'rgba(10, 10, 10, 0.5)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)', borderBottom: '1px solid rgba(255,255,255,0.1)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 24px', color: '#ffffff' },
-      position: { x: 0, y: 0, width: 1200, height: 70, absolute: true }
+      styles: { 
+        backgroundColor: 'rgba(10, 10, 10, 0.6)', 
+        backdropFilter: 'blur(16px)', 
+        WebkitBackdropFilter: 'blur(16px)', 
+        borderBottom: '1px solid rgba(255,255,255,0.05)', 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'center', 
+        padding: '0 40px', 
+        color: '#ffffff' 
+      },
+      position: { x: 0, y: 0, width: 1200, height: 80, absolute: true }
     },
     {
       id: 'hero-1',
       type: 'hero',
-      props: { title: 'The Future of Web Design.', subtitle: 'Build impossible things at the speed of thought. Powered by AI and cutting-edge visual development.' },
-      styles: { backgroundColor: 'transparent', color: '#ffffff', alignItems: 'center', justifyContent: 'center' },
-      position: { x: 200, y: 150, width: 800, height: 300, absolute: true }
+      props: { 
+        title: 'Design the Impossible', 
+        subtitle: 'The world\'s most advanced visual engine. Powered by real-time WebGL, AI physics, and unrestricted creativity.' 
+      },
+      styles: { 
+        backgroundColor: 'transparent', 
+        color: '#ffffff', 
+        alignItems: 'center', 
+        justifyContent: 'center',
+        textAlign: 'center',
+        padding: '0 60px'
+      },
+      position: { x: 100, y: 140, width: 1000, height: 350, absolute: true }
     },
     {
       id: 'btn-1',
       type: 'button',
       props: { text: 'Start Building Free', actionType: 'navigate', actionTarget: 'page-pricing' },
-      styles: { padding: '12px 24px', backgroundColor: '#ffffff', color: '#000000', borderRadius: '30px', cursor: 'pointer', fontWeight: 'bold', fontSize: '16px' },
-      position: { x: 500, y: 400, width: 200, height: 50, absolute: true }
+      styles: { 
+        padding: '16px 32px', 
+        background: 'linear-gradient(135deg, #4f46e5 0%, #ec4899 100%)',
+        color: '#ffffff', 
+        borderRadius: '40px', 
+        cursor: 'pointer', 
+        fontWeight: '800', 
+        fontSize: '16px',
+        boxShadow: '0 10px 25px -5px rgba(79, 70, 229, 0.5), 0 8px 10px -6px rgba(236, 72, 153, 0.4)',
+        border: 'none',
+        letterSpacing: '0.5px'
+      },
+      position: { x: 480, y: 440, width: 240, height: 60, absolute: true }
     },
     {
       id: 'glass-1',
       type: 'glasscard',
       props: { title: 'AI Physics Engine' },
       styles: { 
-        backgroundColor: 'rgba(255, 255, 255, 0.05)', 
-        backdropFilter: 'blur(20px)', 
-        WebkitBackdropFilter: 'blur(20px)', 
-        borderRadius: '24px', 
+        backgroundColor: 'rgba(255, 255, 255, 0.03)', 
+        backdropFilter: 'blur(30px)', 
+        WebkitBackdropFilter: 'blur(30px)', 
+        borderRadius: '32px', 
         border: '1px solid rgba(255, 255, 255, 0.1)',
-        boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.37)'
+        borderTop: '1px solid rgba(255, 255, 255, 0.2)',
+        borderLeft: '1px solid rgba(255, 255, 255, 0.15)',
+        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.7)',
+        padding: '30px'
       },
-      position: { x: 100, y: 550, width: 300, height: 200, absolute: true }
+      position: { x: 80, y: 620, width: 320, height: 260, absolute: true }
     },
     {
       id: 'glass-2',
       type: 'glasscard',
       props: { title: 'WebGL Animations' },
       styles: { 
-        backgroundColor: 'rgba(255, 255, 255, 0.05)', 
-        backdropFilter: 'blur(20px)', 
-        WebkitBackdropFilter: 'blur(20px)', 
-        borderRadius: '24px', 
+        backgroundColor: 'rgba(255, 255, 255, 0.03)', 
+        backdropFilter: 'blur(30px)', 
+        WebkitBackdropFilter: 'blur(30px)', 
+        borderRadius: '32px', 
         border: '1px solid rgba(255, 255, 255, 0.1)',
-        boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.37)'
+        borderTop: '1px solid rgba(255, 255, 255, 0.2)',
+        borderLeft: '1px solid rgba(255, 255, 255, 0.15)',
+        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.7)',
+        padding: '30px'
       },
-      position: { x: 450, y: 550, width: 300, height: 200, absolute: true }
+      position: { x: 440, y: 620, width: 320, height: 260, absolute: true }
     },
     {
       id: 'video-1',
       type: 'video',
-      props: {},
-      styles: { backgroundColor: '#18181b', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)' },
-      position: { x: 800, y: 550, width: 300, height: 200, absolute: true }
+      props: { src: 'https://cdn.dribbble.com/users/3281732/screenshots/11559858/media/7b744d2d46df3c6c189b826f437c35fa.mp4' },
+      styles: { 
+        backgroundColor: '#000000', 
+        borderRadius: '32px', 
+        border: '1px solid rgba(255,255,255,0.1)',
+        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(79, 70, 229, 0.3)',
+        overflow: 'hidden'
+      },
+      position: { x: 800, y: 620, width: 320, height: 260, absolute: true }
     }
   ]
 };
