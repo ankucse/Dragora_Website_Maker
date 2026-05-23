@@ -8,7 +8,7 @@ export function PropertiesPanel() {
     <div className="w-80 bg-surface/80 backdrop-blur-3xl border-l border-border p-5 flex flex-col z-10 pt-20 overflow-y-auto custom-scrollbar text-gray-300">
       <div className="flex items-center justify-between mb-6 pb-4 border-b border-white/5">
         <h3 className="font-semibold text-white">Properties</h3>
-        <span className="text-[10px] px-2 py-1 bg-primary/20 text-primary rounded border border-primary/30 font-mono">Hero Section</span>
+        <span className="text-[10px] px-2 py-1 bg-primary/20 text-primary rounded border border-primary/30 font-mono">{selectedId}</span>
       </div>
 
       <div className="space-y-6">
