@@ -101,40 +101,69 @@ export default function DashboardPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Projects List */}
           <div className="lg:col-span-2 space-y-4">
-            <h2 className="text-xl font-semibold mb-6">Recent Projects</h2>
-            {[1, 2].map((project) => (
-              <motion.div 
-                key={project}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.3 + (project * 0.1) }}
-                className="group relative bg-zinc-900/30 border border-white/5 hover:border-indigo-500/30 rounded-2xl p-6 transition-all cursor-pointer overflow-hidden"
-                onClick={() => navigate(`/editor/proj-${project}`)}
-              >
-                <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/0 via-indigo-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                <div className="relative z-10 flex items-center justify-between">
-                  <div className="flex items-center gap-6">
-                    <div className="w-16 h-16 rounded-xl bg-zinc-800 border border-white/10 flex items-center justify-center group-hover:scale-105 transition-transform">
-                      <LayoutDashboard className="w-6 h-6 text-zinc-500 group-hover:text-indigo-400 transition-colors" />
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-bold group-hover:text-indigo-300 transition-colors flex items-center gap-2">
-                        project-acme-frontend
-                        <span className="px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 text-[10px] uppercase font-bold tracking-wider">Production</span>
-                      </h3>
-                      <p className="text-sm text-zinc-500 mt-1">acme-frontend.lumina.build</p>
-                    </div>
+            <h2 className="text-xl font-semibold mb-6">Recent Projects & Templates</h2>
+            
+            {/* Unicorn SaaS Template */}
+            <motion.div 
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.4 }}
+              className="group relative bg-gradient-to-r from-indigo-500/10 to-purple-500/10 border border-indigo-500/30 hover:border-indigo-400 rounded-2xl p-6 transition-all cursor-pointer overflow-hidden mb-4 shadow-[0_0_30px_rgba(99,102,241,0.15)]"
+              onClick={() => navigate('/editor/unicorn-saas')}
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/0 via-indigo-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+              <div className="relative z-10 flex items-center justify-between">
+                <div className="flex items-center gap-6">
+                  <div className="w-16 h-16 rounded-xl bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center group-hover:scale-105 transition-transform">
+                    <Zap className="w-8 h-8 text-indigo-400 drop-shadow-[0_0_10px_rgba(99,102,241,0.8)]" />
                   </div>
-                  <div className="hidden sm:block text-right">
-                    <p className="text-sm text-zinc-400 flex items-center justify-end gap-2">
-                      <span className="w-2 h-2 rounded-full bg-green-500"></span>
-                      Deployed 2m ago
-                    </p>
-                    <p className="text-xs text-zinc-600 mt-1 font-mono">Commit: 7a8b9c2</p>
+                  <div>
+                    <h3 className="text-xl font-black text-white group-hover:text-indigo-300 transition-colors flex items-center gap-2 tracking-tight">
+                      Unicorn SaaS Landing Page
+                      <span className="px-2 py-0.5 rounded-full bg-indigo-500 text-white text-[10px] uppercase font-bold tracking-wider">Premium Template</span>
+                    </h3>
+                    <p className="text-sm text-indigo-200 mt-1">Multi-page V3 Architecture • Responsive • Glassmorphism</p>
                   </div>
                 </div>
-              </motion.div>
-            ))}
+                <div className="hidden sm:flex items-center gap-3">
+                  <span className="px-4 py-2 rounded-lg bg-white text-black font-bold text-sm hover:bg-zinc-200 transition-colors">
+                    Open Editor
+                  </span>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Standard Project */}
+            <motion.div 
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.5 }}
+              className="group relative bg-zinc-900/30 border border-white/5 hover:border-white/20 rounded-2xl p-6 transition-all cursor-pointer overflow-hidden"
+              onClick={() => navigate('/editor/proj-acme')}
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+              <div className="relative z-10 flex items-center justify-between">
+                <div className="flex items-center gap-6">
+                  <div className="w-16 h-16 rounded-xl bg-zinc-800 border border-white/10 flex items-center justify-center group-hover:scale-105 transition-transform">
+                    <LayoutDashboard className="w-6 h-6 text-zinc-500 group-hover:text-white transition-colors" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold group-hover:text-white transition-colors flex items-center gap-2">
+                      project-acme-frontend
+                      <span className="px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-300 text-[10px] uppercase font-bold tracking-wider border border-white/10">Production</span>
+                    </h3>
+                    <p className="text-sm text-zinc-500 mt-1">acme-frontend.lumina.build</p>
+                  </div>
+                </div>
+                  <div className="hidden sm:block text-right">
+                  <p className="text-sm text-zinc-400 flex items-center justify-end gap-2">
+                    <span className="w-2 h-2 rounded-full bg-green-500"></span>
+                    Published 2m ago
+                  </p>
+                  <p className="text-xs text-zinc-600 mt-1 font-mono">Last edited today</p>
+                </div>
+              </div>
+            </motion.div>
           </div>
 
           {/* Activity Feed (Linear Style) */}
@@ -143,8 +172,8 @@ export default function DashboardPage() {
             <div className="bg-zinc-900/30 border border-white/5 rounded-2xl p-6">
               <div className="space-y-6">
                 {[
-                  { user: 'S', action: 'deployed to Production', time: '2m ago', color: 'bg-indigo-500' },
-                  { user: 'A', action: 'pushed to main', time: '5m ago', color: 'bg-green-500' },
+                  { user: 'S', action: 'published Unicorn SaaS', time: '2m ago', color: 'bg-indigo-500' },
+                  { user: 'A', action: 'edited Home page', time: '5m ago', color: 'bg-green-500' },
                   { user: 'K', action: 'updated CSS Grid layout', time: '1h ago', color: 'bg-blue-500' },
                   { user: 'S', action: 'invited Alex to Workspace', time: '3h ago', color: 'bg-purple-500' },
                 ].map((act, i) => (

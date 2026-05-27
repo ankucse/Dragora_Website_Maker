@@ -1,122 +1,213 @@
 import { useEditorStore } from '../store/useEditorStore';
-import { Layout, Wand2, MonitorPlay, Play } from 'lucide-react';
+import { Layout, Trash2, Box, Eye, Link, Upload } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useRef } from 'react';
 
 export function PropertiesPanel() {
-  const selectedId = useEditorStore(s => s.selectedId) || 'Hero Mesh Grid';
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const selectedId = useEditorStore(s => s.selectedId);
+  const pages = useEditorStore(s => s.pages);
+  const components = useEditorStore(s => {
+    const page = s.pages.find(p => p.id === s.currentPageId);
+    return page ? page.components : [];
+  });
+  const updateComponent = useEditorStore(s => s.updateComponent);
+  const removeComponent = useEditorStore(s => s.removeComponent);
+
+  const comp = components.find(c => c.id === selectedId);
+
+  if (!comp) {
+    return (
+      <motion.div 
+        initial={{ x: 100, opacity: 0 }}
+        animate={{ x: 0, opacity: 1 }}
+        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+        className="w-[300px] bg-zinc-950/80 backdrop-blur-3xl border-l border-white/10 p-5 flex flex-col items-center justify-center z-10 shadow-[-20px_0_40px_rgba(0,0,0,0.5)] text-center relative"
+      >
+        <div className="absolute inset-0 bg-gradient-to-b from-purple-500/5 to-transparent pointer-events-none"></div>
+        <Layout className="w-8 h-8 text-zinc-700 mb-4" />
+        <p className="text-sm text-zinc-500 font-medium">No component selected</p>
+        <p className="text-xs text-zinc-600 mt-2">Click an element on the canvas to edit its properties.</p>
+      </motion.div>
+    );
+  }
+
+  const handleStyleChange = (key: string, value: string) => {
+    updateComponent(comp.id, { styles: { ...comp.styles, [key]: value } });
+  };
+
+  const handlePositionChange = (key: string, value: any) => {
+    updateComponent(comp.id, { position: { ...comp.position, [key]: value } });
+  };
+
+  const handlePropChange = (key: string, value: string) => {
+    updateComponent(comp.id, { props: { ...comp.props, [key]: value } });
+  };
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        if (event.target?.result) {
+          handlePropChange('src', event.target.result as string);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   return (
     <motion.div 
       initial={{ x: 100, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       transition={{ type: "spring", stiffness: 300, damping: 30 }}
-      className="w-80 bg-zinc-950/80 backdrop-blur-3xl border-l border-white/10 p-5 flex flex-col z-10 pt-28 overflow-y-auto custom-scrollbar text-zinc-300 shadow-[-20px_0_40px_rgba(0,0,0,0.5)] relative"
+      className="w-[300px] bg-zinc-950/80 backdrop-blur-3xl border-l border-white/10 p-5 flex flex-col z-10 pt-28 overflow-y-auto custom-scrollbar text-zinc-300 shadow-[-20px_0_40px_rgba(0,0,0,0.5)] relative"
     >
       <div className="absolute inset-0 bg-gradient-to-b from-purple-500/5 to-transparent pointer-events-none"></div>
 
       <div className="flex items-center justify-between mb-6 pb-4 border-b border-white/10 relative">
         <h3 className="font-bold text-white text-sm">Design Properties</h3>
-        <span className="text-[9px] px-2 py-1 bg-indigo-500/20 text-indigo-300 rounded border border-indigo-500/30 font-mono tracking-wider uppercase">{selectedId}</span>
+        <span className="text-[9px] px-2 py-1 bg-indigo-500/20 text-indigo-300 rounded border border-indigo-500/30 font-mono tracking-wider uppercase">{comp.type}</span>
       </div>
 
       <div className="space-y-8 relative">
         
-        {/* Advanced Layout (Flex/Grid) */}
+        {/* Layout & Transform */}
         <div className="space-y-4">
           <div className="flex items-center gap-2 text-[10px] font-bold text-zinc-500 uppercase tracking-widest">
-            <Layout className="w-3 h-3" /> Layout Engine
+            <Box className="w-3 h-3" /> Size & Position
           </div>
-          <div className="bg-zinc-900/50 border border-white/5 rounded-xl p-1 flex mb-3">
-            <button className="flex-1 py-1.5 px-3 text-[10px] font-medium rounded-lg bg-zinc-800 text-white shadow-sm border border-white/10">Flexbox</button>
-            <button className="flex-1 py-1.5 px-3 text-[10px] font-medium rounded-lg text-zinc-500 hover:text-white transition-colors">CSS Grid</button>
-            <button className="flex-1 py-1.5 px-3 text-[10px] font-medium rounded-lg text-zinc-500 hover:text-white transition-colors">Block</button>
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1.5">
-              <label className="text-[10px] text-zinc-500 font-medium">Direction</label>
-              <select className="w-full bg-zinc-900/80 border border-white/10 rounded-lg p-2 text-xs focus:border-indigo-500 outline-none text-white transition-colors cursor-pointer appearance-none">
-                <option>Row (Horizontal)</option>
-                <option>Column (Vertical)</option>
-              </select>
+          
+          <div className="grid grid-cols-2 gap-2">
+            <div className="space-y-1.5 flex items-center bg-zinc-900/50 p-1.5 rounded-lg border border-white/5">
+              <label className="text-[9px] text-zinc-500 font-medium w-3">X</label>
+              <input type="number" value={Math.round(comp.position.x)} onChange={(e) => handlePositionChange('x', Number(e.target.value))} className="w-full bg-transparent text-xs outline-none text-white font-mono" />
             </div>
-            <div className="space-y-1.5">
-              <label className="text-[10px] text-zinc-500 font-medium">Wrap</label>
-              <select className="w-full bg-zinc-900/80 border border-white/10 rounded-lg p-2 text-xs focus:border-indigo-500 outline-none text-white transition-colors cursor-pointer appearance-none">
-                <option>No Wrap</option>
-                <option>Wrap</option>
-              </select>
+            <div className="space-y-1.5 flex items-center bg-zinc-900/50 p-1.5 rounded-lg border border-white/5">
+              <label className="text-[9px] text-zinc-500 font-medium w-3">Y</label>
+              <input type="number" value={Math.round(comp.position.y)} onChange={(e) => handlePositionChange('y', Number(e.target.value))} className="w-full bg-transparent text-xs outline-none text-white font-mono" />
+            </div>
+            <div className="space-y-1.5 flex items-center bg-zinc-900/50 p-1.5 rounded-lg border border-white/5">
+              <label className="text-[9px] text-zinc-500 font-medium w-3">W</label>
+              <input type="text" value={comp.position.width} onChange={(e) => handlePositionChange('width', e.target.value)} className="w-full bg-transparent text-xs outline-none text-white font-mono" />
+            </div>
+            <div className="space-y-1.5 flex items-center bg-zinc-900/50 p-1.5 rounded-lg border border-white/5">
+              <label className="text-[9px] text-zinc-500 font-medium w-3">H</label>
+              <input type="text" value={comp.position.height} onChange={(e) => handlePositionChange('height', e.target.value)} className="w-full bg-transparent text-xs outline-none text-white font-mono" />
             </div>
           </div>
           
           <div className="space-y-1.5">
-             <label className="text-[10px] text-zinc-500 font-medium">Justify Content</label>
-             <div className="flex gap-1">
-                {['start', 'center', 'end', 'between', 'around'].map(j => (
-                  <div key={j} className="h-6 flex-1 bg-zinc-900 border border-white/10 rounded flex items-center justify-center hover:bg-zinc-800 cursor-pointer transition-colors group">
-                    <div className={`w-3 h-0.5 bg-zinc-500 group-hover:bg-white rounded-full`}></div>
-                  </div>
-                ))}
-             </div>
+            <label className="text-[10px] text-zinc-500 font-medium">Border Radius</label>
+            <input type="text" value={comp.styles.borderRadius || '0px'} onChange={(e) => handleStyleChange('borderRadius', e.target.value)} className="w-full bg-zinc-900/80 border border-white/10 rounded-lg p-2 text-xs focus:border-indigo-500 outline-none text-white transition-colors" />
           </div>
         </div>
 
-        {/* Visual Effects (Mesh / Liquid) */}
-        <div className="space-y-4 pt-6 border-t border-white/10">
-          <div className="flex items-center gap-2 text-[10px] font-bold text-zinc-500 uppercase tracking-widest flex-1">
-            <Wand2 className="w-3 h-3" /> Next-Gen Effects
-            <span className="ml-auto text-[8px] bg-indigo-500 text-white px-1.5 py-0.5 rounded uppercase font-bold">Pro</span>
-          </div>
-          
-          <div className="space-y-3">
-            <div className="flex items-center justify-between p-2.5 rounded-xl bg-zinc-900/50 border border-white/10 cursor-pointer hover:border-indigo-500/50 transition-colors">
-              <span className="text-xs font-medium">Mesh Gradient</span>
-              <div className="w-8 h-4 rounded bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500"></div>
-            </div>
-            <div className="flex items-center justify-between p-2.5 rounded-xl bg-zinc-900/50 border border-white/10 cursor-pointer hover:border-indigo-500/50 transition-colors">
-              <span className="text-xs font-medium">Glassmorphism Blur</span>
-              <span className="text-xs text-zinc-500">12px</span>
-            </div>
-            <div className="flex items-center justify-between p-2.5 rounded-xl bg-zinc-900/50 border border-white/10 cursor-pointer hover:border-indigo-500/50 transition-colors">
-              <span className="text-xs font-medium">Liquid Reveal</span>
-              <div className="w-6 h-3 rounded-full bg-zinc-700 relative"><div className="absolute right-0.5 top-0.5 w-2 h-2 rounded-full bg-zinc-400"></div></div>
-            </div>
-          </div>
-        </div>
-
-        {/* Motion Timeline */}
+        {/* Content Properties */}
         <div className="space-y-4 pt-6 border-t border-white/10">
           <div className="flex items-center gap-2 text-[10px] font-bold text-zinc-500 uppercase tracking-widest">
-            <MonitorPlay className="w-3 h-3" /> Scroll Animations
+            <Type className="w-3 h-3" /> Content
+          </div>
+          
+          {comp.props.text !== undefined && (
+            <div className="space-y-1.5">
+              <label className="text-[10px] text-zinc-500 font-medium">Text (or double-click canvas)</label>
+              <textarea 
+                value={comp.props.text} 
+                onChange={(e) => handlePropChange('text', e.target.value)}
+                className="w-full bg-zinc-900/80 border border-white/10 rounded-lg p-2 text-xs focus:border-indigo-500 outline-none text-white transition-colors min-h-[60px]" 
+              />
+            </div>
+          )}
+          
+          {(comp.type === 'image' || comp.type === 'video') && (
+            <div className="space-y-1.5">
+              <label className="text-[10px] text-zinc-500 font-medium">Media Source (URL or Upload)</label>
+              <div className="flex gap-2">
+                <input type="text" value={comp.props.src || ''} onChange={(e) => handlePropChange('src', e.target.value)} className="w-full bg-zinc-900/80 border border-white/10 rounded-lg p-2 text-xs focus:border-indigo-500 outline-none text-white transition-colors" />
+                <button onClick={() => fileInputRef.current?.click()} className="p-2 bg-indigo-500/20 text-indigo-400 rounded-lg hover:bg-indigo-500/40 border border-indigo-500/50 transition-colors shrink-0">
+                  <Upload className="w-4 h-4" />
+                </button>
+                <input type="file" ref={fileInputRef} onChange={handleFileUpload} accept="image/*,video/*" className="hidden" />
+              </div>
+            </div>
+          )}
+          
+          {(comp.type === 'button' || comp.type === 'form') && (
+             <div className="space-y-3 pt-4 border-t border-white/10">
+               <div className="flex items-center gap-2 text-[10px] font-bold text-zinc-500 uppercase tracking-widest">
+                 <Link className="w-3 h-3" /> Actions
+               </div>
+               <div className="space-y-1.5">
+                 <label className="text-[10px] text-zinc-500 font-medium">On Click</label>
+                 <select value={comp.props.actionType || 'none'} onChange={(e) => handlePropChange('actionType', e.target.value)} className="w-full bg-zinc-900/80 border border-white/10 rounded-lg p-2 text-xs focus:border-indigo-500 outline-none text-white transition-colors">
+                   <option value="none">None</option>
+                   <option value="navigate">Navigate to Page</option>
+                   <option value="alert">Show Success Alert</option>
+                 </select>
+               </div>
+               
+               {comp.props.actionType === 'navigate' && (
+                 <div className="space-y-1.5">
+                   <label className="text-[10px] text-zinc-500 font-medium">Target Page</label>
+                   <select value={comp.props.actionTarget || ''} onChange={(e) => handlePropChange('actionTarget', e.target.value)} className="w-full bg-zinc-900/80 border border-white/10 rounded-lg p-2 text-xs focus:border-indigo-500 outline-none text-white transition-colors">
+                     <option value="">Select a page...</option>
+                     {pages.map(p => (
+                       <option key={p.id} value={p.id}>{p.name}</option>
+                     ))}
+                   </select>
+                 </div>
+               )}
+             </div>
+          )}
+        </div>
+
+        {/* Visual Effects */}
+        <div className="space-y-4 pt-6 border-t border-white/10">
+          <div className="flex items-center gap-2 text-[10px] font-bold text-zinc-500 uppercase tracking-widest flex-1">
+            <Eye className="w-3 h-3" /> Appearance
           </div>
           
           <div className="space-y-3">
+             <div className="space-y-1.5">
+              <label className="text-[10px] text-zinc-500 font-medium">Background</label>
+              <div className="flex gap-2">
+                <div className="w-8 h-8 rounded border border-white/10 flex-shrink-0" style={{ backgroundColor: comp.styles.backgroundColor || 'transparent' }}></div>
+                <input type="text" value={comp.styles.backgroundColor || 'transparent'} onChange={(e) => handleStyleChange('backgroundColor', e.target.value)} className="w-full bg-zinc-900/80 border border-white/10 rounded-lg p-2 text-xs focus:border-indigo-500 outline-none text-white transition-colors" />
+              </div>
+            </div>
+            
             <div className="space-y-1.5">
-              <label className="text-[10px] text-zinc-500 font-medium flex justify-between">
-                <span>Trigger Offset</span>
-                <span className="text-indigo-400">20%</span>
-              </label>
-              <input type="range" className="w-full accent-indigo-500 h-1 bg-zinc-800 rounded-full appearance-none" />
-            </div>
-            
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1.5">
-                <label className="text-[10px] text-zinc-500 font-medium">Initial State</label>
-                <div className="p-2 bg-zinc-900 border border-white/10 rounded-lg text-xs text-center">y: 50, opacity: 0</div>
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-[10px] text-zinc-500 font-medium">Animate State</label>
-                <div className="p-2 bg-zinc-900 border border-indigo-500/30 rounded-lg text-xs text-center text-indigo-300">y: 0, opacity: 1</div>
+              <label className="text-[10px] text-zinc-500 font-medium">Color</label>
+              <div className="flex gap-2">
+                <div className="w-8 h-8 rounded border border-white/10 flex-shrink-0" style={{ backgroundColor: comp.styles.color || 'transparent' }}></div>
+                <input type="text" value={comp.styles.color || 'transparent'} onChange={(e) => handleStyleChange('color', e.target.value)} className="w-full bg-zinc-900/80 border border-white/10 rounded-lg p-2 text-xs focus:border-indigo-500 outline-none text-white transition-colors" />
               </div>
             </div>
-            
-            <button className="w-full py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-xs font-medium transition-colors flex items-center justify-center gap-2">
-              <Play className="w-3 h-3" /> Preview Animation
-            </button>
+
+            <div className="space-y-1.5">
+              <label className="text-[10px] text-zinc-500 font-medium">Opacity</label>
+              <input type="range" min="0" max="1" step="0.1" value={comp.styles.opacity || 1} onChange={(e) => handleStyleChange('opacity', e.target.value)} className="w-full accent-indigo-500" />
+            </div>
           </div>
+        </div>
+
+        {/* Actions */}
+        <div className="pt-6 border-t border-white/10 pb-12">
+           <button 
+             onClick={() => removeComponent(comp.id)}
+             className="w-full py-2.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 rounded-lg text-xs font-bold transition-colors flex items-center justify-center gap-2"
+           >
+             <Trash2 className="w-4 h-4" /> Delete Component
+           </button>
         </div>
 
       </div>
     </motion.div>
   );
+}
+
+function Type(props: any) {
+  return <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" x2="15" y1="20" y2="20"/><line x1="12" x2="12" y1="4" y2="20"/></svg>
 }
